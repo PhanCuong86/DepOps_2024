@@ -48,3 +48,14 @@ resource "aws_route_table_association" "public_association" {
     subnet_id = each.value.id
     route_table_id = aws_route_table.public.id
 }
+resource "aws_eip" "nat" {
+    vpc = true
+}
+resource "aws_nat_gateway" "public" {
+    depends_on = [aws_internet_gateway.ig]
+    allocation = aws__eip.nat.id 
+    subnet_id = aws_subnet.public_subnet[0].id
+    tags = {
+        Name = "public Nat"
+    }
+}
