@@ -1,5 +1,6 @@
 provider "aws" {
   region     = "ap-southeast-2"
+  profile = "user1"
 }
 /* # Maintain the statefile in s3
 terraform {
