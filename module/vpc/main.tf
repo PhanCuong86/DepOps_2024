@@ -35,7 +35,7 @@ resource "aws_internet_gateway" "ig" {
         "Name" = "ig"
     }
 }
-#Route table Public 
+#Route table for Public Subnet's
 resource "aws_route_table" "public" {
     vpc_id = aws_vpc.vpc.id 
     route {
@@ -46,6 +46,7 @@ resource "aws_route_table" "public" {
         "Name" = "public"
     }
 }
+#Route table Association with Public Subnet's
 resource "aws_route_table_association" "public_association" {
     for_each = {
         for k, v in aws_subnet.public_subnet : k => v
@@ -67,6 +68,7 @@ resource "aws_nat_gateway" "public" {
         Name = "public Nat"
     }
 }
+#Route table for Private Subnet's
 resource "aws_route_table" "private" {
     vpc_id = aws_vpc.vpc.id
     route {
@@ -77,6 +79,7 @@ resource "aws_route_table" "private" {
         "Name" = "private"
     }
 }
+#Route table Association with Private Subnet's
 resource "aws_route_table_association" "public_private" {
     for_each = {
         for k, v in aws_subnet.private_subnet : k => v
