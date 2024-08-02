@@ -23,10 +23,16 @@ module "vpc_sg" {
   source = "./vpc_sg"
   vpc_id = module.vpc.vpc_id
 }
+# Tạo key_pair
+resource "aws_key_pair" "my_key_pair" {
+  key_name   = var.key_name
+  public_key = file("~/.ssh/rsa_demo.pub")
+}
 #module ec2
 module "ec2" {
   source = "./ec2"
   vpc_id = module.vpc.vpc_id
   subnet_id = module.vpc.public_subnet
   availability_zone = ["ap-southeast-2a", "ap-southeast-2b", "ap-southeast-2c"]
+  key_name           = aws_key_pair.my_key_pair.key_name
 }

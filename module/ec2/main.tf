@@ -1,13 +1,7 @@
-resource "tls_private_key" "rsa_demo" {
-  algorithm = "RSA"
-  rsa_bits  = 4096
+resource "aws_key_pair" "my_key_pair" {
+  key_name   = "my_key_pair"
+  public_key = file("~/.ssh/rsa_demo.pub")
 }
-
-resource "aws_key_pair" "generated_key" {
-  key_name   = var.key_name
-  public_key = tls_private_key.rsa_demo.public_key_openssh
-}
-
 
 resource "aws_security_group" "ec2_sg" {
     name = "web-srv-sg"
@@ -47,8 +41,7 @@ resource "aws_instance" "main_ec2" {
     subnet_id         = element(var.subnet_id, 0) # Lấy subnet đầu tiên từ danh sách
     availability_zone = element(var.availability_zone, 0) # Lấy availability zone đầu tiên từ danh sách
     security_groups   = [aws_security_group.ec2_sg.id] # Đưa vào danh sách
-    key_name = "rsa_demo"
-    
+    key_name               = aws_key_pair.my_key_pair.key_name
     tags = {
         "Name" = "main_ec2"
     }
