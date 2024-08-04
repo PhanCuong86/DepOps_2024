@@ -1,3 +1,2 @@
 variable "vpc_id" {
-
 }
