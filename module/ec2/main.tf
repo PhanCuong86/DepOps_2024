@@ -1,7 +1,4 @@
-resource "aws_key_pair" "my_key_pair" {
-  key_name   = "my_key_pair"
-  public_key = file("~/.ssh/rsa_demo.pub")
-}
+
 
 resource "aws_security_group" "ec2_sg" {
     name = "web-srv-sg"
@@ -38,10 +35,8 @@ resource "aws_security_group" "ec2_sg" {
 resource "aws_instance" "main_ec2" {
     ami = "ami-0809dd5035d9217b8"
     instance_type = "t2.micro"
-    subnet_id         = element(var.subnet_id, 0) # Lấy subnet đầu tiên từ danh sách
-    availability_zone = element(var.availability_zone, 0) # Lấy availability zone đầu tiên từ danh sách
     security_groups   = [aws_security_group.ec2_sg.id] # Đưa vào danh sách
-    key_name               = aws_key_pair.my_key_pair.key_name
+   
     tags = {
         "Name" = "main_ec2"
     }
