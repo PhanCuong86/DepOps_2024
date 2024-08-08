@@ -122,7 +122,7 @@ resource "aws_key_pair" "demoenvkey" {
   key_name   = "demoenvkey"
   public_key = var.public-key
 }
-#t
+
 resource "aws_instance" "vm" {
     subnet_id = aws_subnet.testing-subnet.id
     ami = var.ami
