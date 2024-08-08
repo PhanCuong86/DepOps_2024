@@ -2,8 +2,8 @@ name: Full Deployment
 run-name: Create Env and Run Deployment via TF and CF
 
 on:
-  #push:
-  #  branches: [ "main" ]
+  push:
+    branches: [ "master" ]
   #pull_request:
   #  branches: [ "main" ]
   workflow_dispatch: 
