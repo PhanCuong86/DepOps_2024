@@ -112,7 +112,7 @@ resource "aws_subnet" "testing-subnet-2" {
     }
   
 }
-
+#jj
 resource "aws_eip" "elastic-ip" {
     domain = "vpc"
     instance = aws_instance.vm.id 
