@@ -1,0 +1,208 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Description: Testing template 
+
+Parameters:
+  UserData:
+    Type: String
+    Default: IyEgL2Jpbi9iYXNoCnN1ZG8gYXB0LWdldCB1cGRhdGUKc3VkbyBhcHQtZ2V0IGluc3RhbGwgbmdpbnggLXkKZWNobyAiPGgxPkhpIERDMS1UaGlzIGlzIEdpdGh1YiBBY3Rpb24gUGlwZWxpbmU8L2gxPiIgfCBzdWRvIHRlZSAvdmFyL3d3dy9odG1sL2luZGV4Lm5naW54LWRlYmlhbi5odG1s
+
+Resources:
+  VPC:
+    Type: AWS::EC2::VPC
+    Properties:
+      CidrBlock: 11.11.0.0/16
+      EnableDnsSupport: true
+      EnableDnsHostnames: true
+      Tags:
+      - Key: VPC
+        Value: Test_VPC
+  
+  InternetGateway:
+    Type: AWS::EC2::InternetGateway
+    Properties:
+      Tags:
+      - Key: InternetGateway
+        Value: InternetGateway
+        
+  InternetGatewayAttachment:
+    Type: AWS::EC2::VPCGatewayAttachment
+    Properties:
+      InternetGatewayId: !Ref InternetGateway
+      VpcId: !Ref VPC
+  
+  EIP:
+    Type: AWS::EC2::EIP
+    Properties:
+      InstanceId: !Ref Instance
+  
+  RouteTable:
+    Type: AWS::EC2::RouteTable
+    Properties:
+      VpcId:  
+        Ref: VPC
+      Tags:
+      - Key: route
+        Value: vpcroute
+
+  CarrierRoute:
+    Type: AWS::EC2::Route
+    Properties:
+       RouteTableId:
+         Ref: RouteTable
+       DestinationCidrBlock: 0.0.0.0/0
+       GatewayId:
+         Ref: InternetGateway  
+  
+  SubnetRouteTableAssociation:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      SubnetId:
+        Ref: SubnetInstanceID
+      RouteTableId:
+        Ref: RouteTable
+
+  SubnetRouteTableAssociationDatabase:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      SubnetId:
+        Ref: SubnetDatabaseID
+      RouteTableId:
+        Ref: RouteTable
+
+  KeyPair:
+    Type: AWS::EC2::KeyPair
+    Properties:
+      KeyName: demoenvkey
+      PublicKeyMaterial: ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDS5GQzu89D2Fncs6igs1GzhfgXaqnAXaF3j71Nmf0VG66jnXyQh4wbFL9XwWsZ/rDUPQmq2NI7MaElvfadNpPolTpyOiUIKHXrQA1JyYtNfaTmWE/kxoGw95n+oJk54GfEKOgyxy1UjRkBFnBE4UbTXO5LaRxDMgPeZdYV91+Uk5cvW8rDwjgXgiJOFiEZCadVN190qckW+Wmf1w4FOCyPpGt91jagGEU43b3/vDTKLPBnU4vPbWVM8zuEWFqt42kxpAs0Jyj1+L7LaUmjfO7JuESbwK6r3vrxKU4milkvbtVNVnL4j4lZcJji1rf6WsnPTkhDVVbEZWxWNnd/b1gX rsa-key-20240802
+
+  Instance:
+    Type: AWS::EC2::Instance
+    Properties:
+      ImageId: ami-03f0544597f43a91d
+      InstanceType: t3.micro
+      SecurityGroupIds: [!Ref InstanceSecurityGroup]
+      SubnetId: !Ref SubnetInstanceID
+      KeyName: !Ref KeyPair
+      UserData:
+        Fn::Base64:
+          Ref: UserData
+#        Fn::Base64: !Sub |
+#              #! /bin/bash
+#              sudo apt-get update
+#              sudo apt-get install nginx -y
+#              echo "<h1>Hi DC1-This is Github Action Pipeline</h1>" | sudo tee /var/www/html/index.nginx-debian.html
+      Tags:
+      - Key: Instance
+        Value: dc1WebServer
+        
+  InstanceSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      VpcId: !Ref VPC
+      GroupDescription: SecurityGroupTesting
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: 80
+          ToPort: 80
+          CidrIp: 0.0.0.0/0
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: 22
+          ToPort: 22
+          CidrIp: 0.0.0.0/0
+      SecurityGroupEgress:
+        - IpProtocol: tcp
+          FromPort: 0
+          ToPort: 65535
+          CidrIp: 0.0.0.0/0
+      Tags:
+      - Key: SG
+        Value: SGTesting     
+        
+  VPCIngress:
+    Type: AWS::EC2::SecurityGroupIngress
+    Properties:
+      IpProtocol: tcp
+      FromPort: 0
+      ToPort: 65535
+      CidrIp: "0.0.0.0/0"
+#      SourceSecurityGroupId: 
+#        Fn::GetAtt:
+#          - InstanceSecurityGroup
+#          - GroupId
+      GroupId: !Ref InstanceSecurityGroup
+#        Fn::GetAtt:
+#          - InstanceSecurityGroup
+#          - GroupId
+
+  VPCEGress:  
+    Type: AWS::EC2::SecurityGroupEgress
+    Properties:
+      IpProtocol: tcp
+      FromPort: 0
+      ToPort: 65535
+      CidrIp: "0.0.0.0/0"
+#      DestinationSecurityGroupId:
+#        Fn::GetAtt:
+#          - InstanceSecurityGroup
+#          - GroupId
+      GroupId: !Ref InstanceSecurityGroup
+#        Fn::GetAtt:
+#          - InstanceSecurityGroup
+#          - GroupId
+        
+  SubnetInstanceID:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: !Ref VPC
+      CidrBlock: 11.11.11.0/24
+      AvailabilityZone: "ap-southeast-2a"
+      Tags:
+      - Key: Subnet
+        Value: InstanceSubnet
+        
+  SubnetDatabaseID:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: !Ref VPC
+      CidrBlock: 11.11.12.0/24
+      AvailabilityZone: "ap-southeast-2b"
+      Tags:
+      - Key: Subnet
+        Value: DatabaseSubnet
+        
+  SubnetDatabase:
+    Type: AWS::RDS::DBSubnetGroup
+    Properties:
+      DBSubnetGroupName: DatabaseSubnet
+      DBSubnetGroupDescription: TestingDatabaseSubnet
+      SubnetIds: [ !Ref SubnetDatabaseID, !Ref SubnetInstanceID ]
+      Tags:
+      - Key: dbsubnet
+        Value: DatabaseSubnet
+        
+  DatabaseInstance:
+    Type: AWS::RDS::DBInstance
+    Properties:
+      AllocatedStorage: '100'
+      VPCSecurityGroups: [!Ref InstanceSecurityGroup]
+      DBSubnetGroupName: !Ref SubnetDatabase
+      DBName: testingdatabase
+#      AutomaticBackupReplicationRegion: "ap-northeast-1"
+#      BackupRetentionPeriod: 1
+      DBInstanceClass: db.t3.micro
+      Engine: postgres
+      Iops: 1000
+      MasterUsername: "dc1testing"
+      MasterUserPassword: "dc1testing"
+      StorageType: IO1
+      Tags:
+      - Key: Database
+        Value: TestingDatabase
+Outputs:
+  StackEIPGeneral:
+    Description: Return EIP General
+    Value: !Ref EIP
+
+
+  
