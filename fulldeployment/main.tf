@@ -32,7 +32,7 @@ resource "aws_internet_gateway" "internet-gateway" {
 resource "aws_route_table" "vpc-route" {
     vpc_id = aws_vpc.tf-testing-vpc.id
     route {
-        cidr_block = "12.12.0.0/16"
+        cidr_block = "10.10.0.0/16"
         gateway_id = "local"
     }
     route {
@@ -95,7 +95,7 @@ resource "aws_vpc_security_group_egress_rule" "egress-allow-all" {
 
 resource "aws_subnet" "testing-subnet" {
     vpc_id = aws_vpc.tf-testing-vpc.id
-    cidr_block = "12.12.12.0/24"
+    cidr_block = "10.10.10.0/24"
     availability_zone = "ap-southeast-2a"
     tags = {
         subnet = "dc1-testing-subnet2a-web-server"
@@ -105,7 +105,7 @@ resource "aws_subnet" "testing-subnet" {
 
 resource "aws_subnet" "testing-subnet-2" {
     vpc_id = aws_vpc.tf-testing-vpc.id
-    cidr_block = "12.12.13.0/24"
+    cidr_block = "10.10.11.0/24"
     availability_zone = "ap-southeast-2b"
     tags = {
         subnet = "dc1-testing-subnet2b-web-server"

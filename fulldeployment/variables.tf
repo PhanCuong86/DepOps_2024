@@ -3,15 +3,15 @@ variable "aws-region" {
 }
 
 variable "cidr-block" {
-    default = "12.12.0.0/16"
+    default = "10.0.0.0/16"
 }
 
 variable "ami" {
-    default = "ami-03f0544597f43a91d"
+    default = "ami-0809dd5035d9217b8"
 }
 
 variable instance-type {
-    default = "t3.micro"
+    default = "t2.micro"
 }
 
 variable public-key {
