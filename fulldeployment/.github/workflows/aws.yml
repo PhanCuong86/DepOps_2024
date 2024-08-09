@@ -3,7 +3,7 @@ run-name: Create Env and Run Deployment via TF and CF
 
 on:
   push:
-    branches: [ "feature-ec2" ]
+    branches: [ "main" ]
   pull_request:
     branches: [ "main" ]
   workflow_dispatch: 
