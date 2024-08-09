@@ -4,8 +4,8 @@ run-name: Create Env and Run Deployment via TF and CF
 on:
   push:
     branches: [ "feature-ec2" ]
-  #pull_request:
-  #  branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
   workflow_dispatch: 
 env:
   AWS_REGION: ap-southeast-2
